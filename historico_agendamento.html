@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, initial-scale=1.0">
+    <title>Histórico de Agendamentos</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #003B5C; /* Cor do brasão da UNEB */
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center; /* Centraliza horizontalmente */
+            align-items: center;     /* Centraliza verticalmente */
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: #f4f4f9;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .header {
+            background-color: #006D93; /* Azul UNEB */
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px;
+            width: 100%; /* Garante que a largura ocupe 100% do contêiner */
+            max-width: 1000px; /* Limita a largura máxima */
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 26px;
+        }
+
+        .history-container {
+            margin-top: 30px;
+            width: 100%; /* Garante que ocupe toda a largura disponível */
+            max-width: 1000px; /* Limita a largura máxima */
+            padding: 0 20px; /* Adiciona um padding lateral */
+            box-sizing: border-box;
+        }
+
+        .history-item {
+            background-color: #E2F1F8;
+            margin: 10px 0;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-item span {
+            font-size: 16px;
+            color: #003B5C;
+        }
+
+        .cancel-button {
+            background-color: #FF4C4C;
+            color: white;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cancel-button:hover {
+            background-color: #D94343;
+        }
+
+        .status {
+            font-weight: bold;
+            font-size: 16px;
+            color: #006D93;
+        }
+
+        .cancelado {
+            color: #D94343; /* Cor para o status cancelado */
+        }
+
+        .logout-button {
+            background-color: #FF4C4C;
+            color: white;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 30px;
+            border: none;
+            display: block;
+            width: 100%;
+            max-width: 300px; /* Limita a largura máxima do botão */
+            margin-left: auto;
+            margin-right: auto; /* Centraliza o botão */
+        }
+
+        .logout-button:hover {
+            background-color: #D94343;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .cancel-button {
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .logout-button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .history-item {
+                padding: 15px;
+            }
+
+            .logout-button {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Histórico de Agendamentos</h1>
+        </div>
+
+        <div class="history-container">
+            <p>Carregando agendamentos...</p>
+        </div>
+
+        <!-- Botão de Logout -->
+        <button class="logout-button" onclick="logout()">Sair</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Carregar agendamentos do backend
+            $.get('/agendamentos', function(agendamentos) {
+                $('.history-container').empty(); // Remove mensagem de carregamento
+
+                if (agendamentos && agendamentos.length > 0) {
+                    agendamentos.forEach(function(agendamento) {
+                        // Criar o item de histórico dinamicamente
+                        let status = agendamento.cancelado ? 
+                                     '<span class="status cancelado">Cancelado</span>' :
+                                     '<span class="status">Confirmado</span>';
+                        let historyItem = `
+                            <div class="history-item" data-id="${agendamento.id}">
+                                <div>
+                                    <span>Data: ${agendamento.data}</span><br>
+                                    <span>Hora de Início: ${agendamento.hora_inicio}</span><br>
+                                    <span>Hora de Término: ${agendamento.hora_fim}</span><br>
+                                    <span>Status: ${status}</span>
+                                </div>
+                                <button class="cancel-button" onclick="cancelarAgendamento(${agendamento.id})">Cancelar</button>
+                            </div>
+                        `;
+                        $('.history-container').append(historyItem);
+                    });
+                } else {
+                    $('.history-container').append('<p>Nenhum agendamento encontrado.</p>');
+                }
+            }).fail(function() {
+                $('.history-container').html('<p>Erro ao carregar agendamentos.</p>');
+            });
+        });
+
+        // Função para cancelar o agendamento
+        function cancelarAgendamento(id) {
+    if (confirm('Você realmente deseja cancelar este agendamento?')) {
+        $.ajax({
+            url: `/agendamentos/${id}`,
+            method: 'DELETE',
+            success: function(response) {
+                alert('Agendamento cancelado com sucesso!');
+                // Remover o elemento do DOM
+                $(`.history-item[data-id="${id}"]`).remove();
+            },
+            error: function(error) {
+                alert('Erro ao cancelar o agendamento.');
+            }
+        });
+    }
+}
+
+        function logout() {
+        // Redirecionar para a tela inicial do professor
+    window.location.href = '/professor';
+}
+    </script>
+
+</body>
+</html>
