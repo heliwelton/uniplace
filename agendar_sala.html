@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Salas</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/locale/pt-br.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #003B5C; /* Cor do brasão da UNEB */
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin-top: 20px;
+            background-color: #f4f4f9;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #003B5C;
+            font-size: 28px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .calendar-container {
+            flex: 1 1 45%;
+            min-width: 350px;
+            margin-right: 20px;
+        }
+
+        .calendar {
+            background-color: #fff;
+            color: #000;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: auto; /* Adicionado para evitar cortes no conteúdo */
+        }
+
+        .form-container {
+            flex: 1 1 45%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-sizing: border-box;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-container label {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #003B5C; /* Alterado para cor visível */
+        }
+
+        .btn {
+            background-color: #003B5C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #005f8f;
+        }
+
+        select, input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .form-container, .calendar-container {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+
+            .btn {
+                font-size: 14px;
+            }
+
+            .calendar-container {
+                margin-right: 0;
+            }
+        }
+
+        /* Estilo do botão de dúvidas */
+        .btn-duvidas {
+            background-color: #FF5733; /* Cor para o botão de dúvidas */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .btn-duvidas:hover {
+            background-color: #ff7043;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Professor, agende suas salas!</h2>
+        
+        <!-- Calendário -->
+        <div class="calendar-container">
+            <div id="calendar" class="calendar"></div>
+        </div>
+
+        <!-- Formulário para agendar -->
+        <div class="form-container">
+            <form id="agendamentoForm">
+                <label for="sala">Escolha a Sala:</label>
+                <select id="sala" name="sala" required>
+                    <option value="">Selecione...</option>
+                </select>
+
+                <label for="data">Data:</label>
+                <input type="date" id="data" name="data" required>
+                
+                <label for="hora_inicio">Hora de Início:</label>
+                <input type="time" id="hora_inicio" name="hora_inicio" required>
+                
+                <label for="hora_fim">Hora de Término:</label>
+                <input type="time" id="hora_fim" name="hora_fim" required>
+
+                <button type="submit" class="btn">Agendar</button>
+            </form>
+            
+            <!-- Botão de dúvidas -->
+            <button class="btn-duvidas" onclick="showHelp()">Dúvidas?</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Carregar salas do backend
+            $.get('/salas', function(salas) {
+                salas.forEach(function(sala) {
+                    $('#sala').append('<option value="' + sala.id + '">' + sala.nome + '</option>');
+                });
+            });
+
+            // Enviar o agendamento para o backend
+            $('#agendamentoForm').submit(function(event) {
+                event.preventDefault();
+
+                const sala_id = $('#sala').val();
+                const data = $('#data').val();
+                const hora_inicio = $('#hora_inicio').val();
+                const hora_fim = $('#hora_fim').val();
+
+                $.ajax({
+                    url: '/agendamentos',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        sala_id: sala_id,
+                        data: data,
+                        hora_inicio: hora_inicio,
+                        hora_fim: hora_fim
+                    }),
+                    success: function(response) {
+                        alert('Agendamento realizado com sucesso!');
+                        $('#calendar').fullCalendar('refetchEvents'); // Atualiza os eventos no calendário
+                    },
+                    error: function(error) {
+                        alert('Erro ao realizar o agendamento.');
+                    }
+                });
+            });
+
+            // Calendário com eventos agendados
+            $('#calendar').fullCalendar({
+        locale: 'pt-br',
+        events: function(start, end, timezone, callback) {
+            $.ajax({
+                url: '/professor/obterAgendamentos',
+                data: {
+                    data: moment(start).format('YYYY-MM-DD') // Passa a data para a consulta
+                },
+                success: function(data) {
+                    var events = data.map(function(item) {
+                        return {
+                            title: item.nome_sala + " - " + item.professor_nome,
+                            start: item.data + 'T' + item.hora_inicio,
+                            end: item.data + 'T' + item.hora_fim,
+                            color: item.status_color, // Usando 'red' ou 'green' como cor
+                        };
+                    });
+                    callback(events);
+                }
+            });
+        },
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        selectable: true,
+        selectHelper: true,
+        select: function(start, end) {
+            // Função para lidar com a seleção de um intervalo de tempo
+            // Aqui você pode abrir um formulário de agendamento para o usuário preencher.
+        }
+    });
+});
+
+        // Função para mostrar dúvidas (pode ser modificada para um modal ou outro conteúdo)
+        function showHelp() {
+            alert('Para agendar uma sala, escolha a sala desejada, selecione a data e as horas de início e término.');
+        }
+    </script>
+</body>
+</html>
