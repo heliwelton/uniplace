@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniPlace - Agendamento de Salas</title>
+    <!-- Link para a fonte Poppins do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #004080; /* Cor de fundo como fallback */
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2lUJrIx7Ac-BNA6yhN9jpe7hlRzcWNYEX2UUZjNFOcMp54uXjZvSfREU&s=10.jpg'); /* Caminho para a imagem */
+            background-size: cover; /* Para a imagem cobrir toda a área de fundo */
+            background-position: center; /* Para centralizar a imagem */
+            background-blend-mode: overlay; /* Mistura a cor de fundo com a imagem */
+            background-color: rgba(0, 0, 0, 0.5); /* Fundo preto semitransparente */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9); /* Fundo branco com opacidade */
+            color: #004080;
+            padding: 30px;
+            border-radius: 12px; /* Bordas arredondadas */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); /* Sombra mais forte */
+            text-align: center;
+            width: 320px; /* Largura do contêiner */
+        }
+
+        h1 {
+            color: #004080;
+            font-weight: 600;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            width: 80%; /* Largura reduzida */
+            padding: 12px 15px; /* Padding ajustado */
+            margin: 10px 0;
+            border: 1px solid #004080; /* Azul UNEB */
+            border-radius: 6px; /* Bordas mais arredondadas */
+            font-size: 14px; /* Font ajustada */
+        }
+
+        /* Ajuste específico para os campos de matrícula e senha */
+        input[type="text"], input[type="password"] {
+            width: 80%; /* Largura ajustada para os campos */
+            padding: 10px 12px; /* Reduzindo o padding */
+            font-size: 14px; /* Font ajustada */
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin: 20px 0;
+            border: none;
+            border-radius: 8px;
+            background-color: #d40000; /* Vermelho UNEB */
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 10px rgba(255, 0, 0, 0.5); /* Sombra vermelha */
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            background-color: #b30000; /* Vermelho mais escuro */
+            box-shadow: 0 8px 15px rgba(255, 0, 0, 0.7); /* Intensifica a sombra */
+        }
+
+        /* Mensagem de erro */
+        #error-message {
+            color: red;
+            display: none;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                width: 90%; /* Ajusta a largura do contêiner em telas pequenas */
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            input, select, button {
+                width: 100%;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Substituindo o título por uma imagem local -->
+        <img src="/images/logo.png" alt="UniPlace Logo" style="max-width: 80%; height: auto; margin-bottom: 20px;">
+
+        <!-- Mensagem de erro -->
+        <div id="error-message"></div>
+
+        <!-- Formulário de login -->
+        <form id="login-form">
+            <!-- Campo de número de matrícula -->
+            <input type="text" id="matricula" placeholder="Número de matrícula" required>
+
+            <!-- Campo de senha -->
+            <input type="password" id="senha" placeholder="Senha (6 primeiros dígitos do CPF)" required>
+
+            <!-- Dropdown de seleção de tipo de usuário -->
+            <select id="tipoUsuario">
+                <option value="administrador">Administrador</option>
+                <option value="professor">Professor</option>
+            </select>
+
+            <!-- Botão de login -->
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+
+    <script>
+        // Previne o envio do formulário e chama a função de login
+        document.getElementById("login-form").addEventListener("submit", function(event) {
+            event.preventDefault();  // Impede o envio padrão do formulário
+            fazerLogin();
+        });
+
+        function fazerLogin() {
+            const matricula = document.getElementById("matricula").value;
+            const senha = document.getElementById("senha").value;
+            const tipoUsuario = document.getElementById("tipoUsuario").value;
+
+            // Limpa qualquer mensagem de erro anterior
+            document.getElementById("error-message").style.display = 'none';
+
+            if (!matricula || !senha || !tipoUsuario) {
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = "Todos os campos são obrigatórios!";
+                return;
+            }
+
+            // Validação adicional (exemplo: se a matrícula deve ser numérica)
+            if (!/^\d+$/.test(matricula)) {
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = "Matrícula deve ser numérica.";
+                return;
+            }
+
+            // Enviar os dados para a rota /login
+            fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ matricula, senha, tipoUsuario })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect; // Redireciona para a página de administrador ou professor
+                } else {
+                    document.getElementById('error-message').style.display = 'block';
+                    document.getElementById('error-message').textContent = "Erro no login: " + (data.message || "Tente novamente.");
+                }
+            })
+            .catch(error => {
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = "Erro ao conectar ao servidor.";
+            });
+        }
+    </script>
+</body>
+</html>
