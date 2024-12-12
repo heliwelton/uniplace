@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniPlace - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #004080; /* Cor do fundo na cor do brasão da UNEB */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Fundo branco translúcido */
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Cabeçalho */
+        .header {
+            text-align: center;
+            color: #004080; /* Azul UNEB */
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .header p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        /* Resumo */
+        .summary {
+            display: flex;
+            justify-content: center; /* Centraliza os itens */
+            gap: 30px; /* Espaçamento entre os itens */
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .summary p {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .summary span {
+            font-weight: bold;
+            color: #004080;
+        }
+
+        /* Notificações */
+        .notifications {
+            text-align: center;
+            background-color: #fff3cd; /* Fundo amarelo claro */
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-size: 16px;
+        }
+
+        .notifications ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            max-width: 300px; /* Limita a largura da lista */
+            text-align: left; /* Alinha o texto à esquerda */
+            margin: 0 auto; /* Centraliza horizontalmente */
+        }
+
+        .notifications ul li {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        /* Abas */
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #004080; /* Azul UNEB */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .tab-button:hover {
+            background-color: #003366;
+        }
+
+        /* Calendário */
+        .calendar-container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.95); /* Fundo branco translúcido */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar {
+            width: 100%;
+            max-width: 500px; /* Largura máxima */
+            height: auto;
+            margin: 0 auto;
+        }
+
+        /* Botão de ajuda */
+        .help-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px;
+            background-color: #004080;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .help-button:hover {
+            background-color: #003366;
+        }
+
+        /* Botão de sair */
+        .logout-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 15px 30px;
+            background-color: #C8102E; /* Vermelho da cor do brasão da UNEB */
+            color: #fff;
+            border: none;
+            border-radius: 50px; /* Borda mais arredondada */
+            font-size: 16px;
+            font-weight: 600; /* Texto em negrito para mais destaque */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s ease-in-out, box-shadow 0.2s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #9E0D1F; /* Vermelho mais escuro no hover */
+            transform: scale(1.05); /* Aumenta um pouco o botão ao passar o mouse */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Sombra mais pronunciada ao passar o mouse */
+        }
+
+        .logout-button:active {
+            background-color: #8A0C18; /* Cor mais escura ao clicar */
+            transform: scale(1); /* Retorna ao tamanho normal quando pressionado */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1>Bem-vindo, Administrador!</h1>
+            <p>Gerencie suas salas e professores de maneira prática e eficiente.</p>
+        </div>
+
+        <!-- Resumo -->
+        <div class="summary">
+            <!-- Dados serão carregados dinamicamente -->
+        </div>
+
+        <!-- Notificações -->
+        <div class="notifications">
+            <!-- Notificações serão carregadas dinamicamente -->
+        </div>
+
+        <!-- Abas -->
+        <div class="tabs">
+            <a href="/cadastrarProfessor"><button class="tab-button">Cadastrar Professor</button></a>
+            <a href="/cadastrarSala"><button class="tab-button">Cadastrar Sala</button></a>
+        </div>
+
+        <!-- Calendário -->
+        <div class="calendar-container">
+            <div class="calendar" id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Botão de sair -->
+    <button class="logout-button" onclick="logout()">Sair</button>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/locale/pt-br.js"></script>
+
+    <script>
+                // Função para carregar o número de salas e professores do localStorage
+                function carregarDados() {
+            const salas = localStorage.getItem('totalSalas') || 0;
+            const professores = localStorage.getItem('totalProfessores') || 0;
+
+            // Atualiza os dados de resumo
+            data.salas = parseInt(salas);
+            data.professores = parseInt(professores);
+            
+            // Atualiza o resumo na tela
+            atualizarResumo();
+        }
+
+        // Atualiza o resumo com as informações mais recentes
+        function atualizarResumo() {
+            const resumo = document.querySelector('.summary');
+            resumo.innerHTML = `
+                <p>Salas cadastradas: <span>${data.salas}</span></p>
+                <p>Professores cadastrados: <span>${data.professores}</span></p>
+                <p>Próximo evento: <span>${
+                    data.proximosEventos.length > 0
+                        ? `${data.proximosEventos[0].sala} reservada em ${data.proximosEventos[0].data}`
+                        : 'Nenhum evento próximo.'
+                }</span></p>`;
+        }
+
+        $(document).ready(function () {
+            carregarDados();
+            atualizarNotificacoes();
+        });
+
+        const data = {
+            salas: 15,
+            professores: 35,
+            proximosEventos: [{ sala: 'Sala 202', data: '2024-11-25' }],
+            notificacoes: [
+                'Pendência: Revisar reserva da Sala 101.',
+                'Pendência: Confirmar cadastro do Professor João Silva.',
+            ],
+        };
+
+        function atualizarResumo() {
+            const resumo = document.querySelector('.summary');
+            resumo.innerHTML = `
+                <p>Salas cadastradas: <span>${data.salas}</span></p>
+                <p>Professores cadastrados: <span>${data.professores}</span></p>
+                <p>Próximo evento: <span>${
+                  data.proximosEventos.length > 0
+                    ? `${data.proximosEventos[0].sala} reservada em ${data.proximosEventos[0].data}`
+                    : 'Nenhum evento próximo.'
+                }</span></p>`;
+        }
+
+        function atualizarNotificacoes() {
+            const notificacoes = document.querySelector('.notifications');
+            notificacoes.innerHTML = `
+                Você tem <span>${data.notificacoes.length}</span> pendências para revisar!
+                <ul>${data.notificacoes
+                  .map((n) => `<li>${n}</li>`)
+                  .join('')}</ul>`;
+        }
+
+        $(document).ready(function () {
+            $('#calendar').fullCalendar({
+                locale: 'pt-br',
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay',
+                },
+                events: [
+                    { title: 'Evento 1', start: '2024-11-25' },
+                    { title: 'Evento 2', start: '2024-11-26' },
+                ],
+            });
+
+            atualizarResumo();
+            atualizarNotificacoes();
+        });
+
+    </script>
+    <script>
+        function logout() {
+        alert('Você saiu do sistema!');
+        // Certifique-se de que a URL '/logout' está configurada corretamente no seu backend
+        window.location.href = '/login'; // Redireciona para a página de logout (login)
+        }
+    </script>
+</body>
+</html>
