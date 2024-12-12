@@ -41,6 +41,51 @@
             margin: 5px 0;
         }
 
+        /* Resumo */
+        .summary {
+            display: flex;
+            justify-content: center; /* Centraliza os itens */
+            gap: 30px; /* Espaçamento entre os itens */
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .summary p {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .summary span {
+            font-weight: bold;
+            color: #004080;
+        }
+
+        /* Notificações */
+        .notifications {
+            text-align: center;
+            background-color: #fff3cd; /* Fundo amarelo claro */
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-size: 16px;
+        }
+
+        .notifications ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            max-width: 300px; /* Limita a largura da lista */
+            text-align: left; /* Alinha o texto à esquerda */
+            margin: 0 auto; /* Centraliza horizontalmente */
+        }
+
+        .notifications ul li {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
         /* Abas */
         .tabs {
             display: flex;
@@ -136,7 +181,7 @@
             <p>Gerencie suas salas e professores de maneira prática e eficiente.</p>
         </div>
 
-        <!-- Abas -->
+             <!-- Abas -->
         <div class="tabs">
             <a href="/cadastrarProfessor"><button class="tab-button">Cadastrar Professor</button></a>
             <a href="/cadastrarSala"><button class="tab-button">Cadastrar Sala</button></a>
@@ -158,6 +203,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/locale/pt-br.js"></script>
 
     <script>
+                   
         $(document).ready(function () {
             $('#calendar').fullCalendar({
                 locale: 'pt-br',
@@ -171,11 +217,17 @@
                     { title: 'Evento 2', start: '2024-11-26' },
                 ],
             });
+
+            atualizarResumo();
+            atualizarNotificacoes();
         });
 
+    </script>
+    <script>
         function logout() {
-            alert('Você saiu do sistema!');
-            window.location.href = '/login'; // Redireciona para a página de logout (login)
+        alert('Você saiu do sistema!');
+        // Certifique-se de que a URL '/logout' está configurada corretamente no seu backend
+        window.location.href = '/login'; // Redireciona para a página de logout (login)
         }
     </script>
 </body>
