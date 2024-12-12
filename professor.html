@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela Inicial - Professor</title>
+    
+    <!-- Inclusão do FullCalendar -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet">
+    <!-- Inclusão do jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Inclusão do FullCalendar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/locale/pt-br.js"></script>
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* Estilos gerais */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #003B5C; /* Cor do brasão da UNEB */
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinhando ao topo */
+            height: 100vh;
+            flex-direction: column;
+            overflow-x: hidden;
+            padding-bottom: 80px; /* Para garantir que o botão de logout tenha espaço */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: #f4f4f9;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            box-sizing: border-box;
+            min-height: 700px;
+        }
+
+        .header {
+            background-color: #006D93;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 24px;
+        }
+
+        .profile {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #00719A;
+            border-radius: 10px;
+        }
+
+        .profile div {
+            color: #fff;
+            text-align: center;
+        }
+
+        .profile h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .profile span {
+            font-size: 14px;
+        }
+
+        .calendar {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            color: #003B5C;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            overflow-y: scroll;
+        }
+
+        .calendar h3 {
+            margin-top: 0;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        /* Resumo do Agendamento do Dia */
+        .daily-summary {
+            background-color: #E2F1F8;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            color: #003B5C;
+            text-align: center;
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
+            max-height: 200px; /* Ajustado para garantir que não ultrapasse o limite */
+            overflow-y: auto;
+        }
+
+        .daily-summary h3 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        /* Botões de Navegação */
+        .navigation {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .navigation button {
+            background-color: #00719A;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .navigation button:hover {
+            background-color: #005F74;
+        }
+
+        /* Botão de Logout - modernizado e reposicionado */
+        .logout-button {
+            background-color: #D40000; /* Vermelho */
+            padding: 12px 25px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 50px; /* Torna o botão mais arredondado */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: fixed;
+            bottom: 20px; /* Fixa no fundo */
+            left: 20px; /* Fixa no canto inferior esquerdo */
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra mais forte */
+        }
+
+        .logout-button:hover {
+            background-color: #b30000; /* Vermelho mais escuro */
+            transform: translateY(-5px); /* Efeito de elevação */
+        }
+
+        /* Botão de ajuda flutuante */
+        .help-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px; /* Posição do botão de ajuda trocada com o de logout */
+            background-color: #FFC107; /* Cor amarela */
+            color: black;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .help-button:hover {
+            background-color: #e0a800; /* Amarelo mais escuro */
+            transform: scale(1.1); /* Efeito de zoom no botão */
+        }
+
+        /* Estilo para o modal de ajuda */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .help-modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .help-modal-content h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .help-modal-content p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .close-help {
+            margin-top: 20px;
+            background-color: #D40000;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-help:hover {
+            background-color: #b30000;
+        }
+
+        /* Modal de Confirmação de Logout */
+        .logout-confirmation {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logout-confirmation-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .logout-confirmation-content h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .logout-confirmation-content p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .cancel-logout, .confirm-logout {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .cancel-logout {
+            background-color: #D40000;
+            color: white;
+        }
+
+        .cancel-logout:hover {
+            background-color: #b30000;
+        }
+
+        .confirm-logout {
+            background-color: #00719A;
+            color: white;
+        }
+
+        .confirm-logout:hover {
+            background-color: #005F74;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1>Bem-vindo ao Sistema de Agendamento de Salas, Professor!</h1>
+        </div>
+
+        <!-- Botões de Navegação (em cima) -->
+        <div class="navigation">
+            <a href="/professor/agendar_sala"><button>Agendar Sala</button></a>
+            <a href="/professor/historico_agendamento"><button>Histórico de Agendamentos</button></a>
+        </div>
+
+             <!-- Calendário -->
+        <div class="calendar">
+            <h3>Calendário de Agendamentos</h3>
+            <div id="calendar"></div>
+        </div>
+
+        <!-- Resumo do Agendamento do Dia -->
+        <div class="daily-summary">
+            <h3>Agendamentos do Dia</h3>
+            <p id="dailySummaryContent">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Botão de Logout -->
+    <button class="logout-button" onclick="confirmLogout()">Sair</button>
+
+    <!-- Modal de Ajuda -->
+    <button class="help-button" onclick="showHelp()">?</button>
+
+    <!-- Modal de Ajuda -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-content">
+            <h3>Precisa de Ajuda?</h3>
+            <p>Para qualquer dúvida ou assistência, entre em contato com nosso suporte:</p>
+            <p><strong>Email:</strong> <a href="mailto:uniplaceas@gmail.com">uniplaceas@gmail.com</a></p>
+            <button class="close-help" onclick="closeHelp()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Logout -->
+    <div class="logout-confirmation" id="logoutConfirmation">
+        <div class="logout-confirmation-content">
+            <h3>Tem certeza que deseja sair?</h3>
+            <p>Você será desconectado do sistema.</p>
+            <button class="confirm-logout" onclick="logout()">Sim</button>
+            <button class="cancel-logout" onclick="cancelLogout()">Não</button>
+        </div>
+    </div>
+
+    <script>
+        // Função de confirmação de logout
+        function confirmLogout() {
+            document.getElementById('logoutConfirmation').style.display = 'flex';
+        }
+
+        // Cancelar o logout
+        function cancelLogout() {
+            document.getElementById('logoutConfirmation').style.display = 'none';
+        }
+
+        // Função de logout
+        function logout() {
+            window.location.href = '/login';  // Redireciona para a página de login
+        }
+
+        // Mostrar o modal de ajuda
+        function showHelp() {
+            document.getElementById('helpModal').style.display = 'flex';
+        }
+
+        // Fechar o modal de ajuda
+        function closeHelp() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+
+        // Requisição para buscar os dados do professor
+        fetch('/professor/dados')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao buscar dados do professor.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Dados recebidos:', data); // Log para verificar a resposta
+
+            if (data.nome && data.curso) {
+                document.getElementById('nomeProfessor').innerText = data.nome;
+                document.getElementById('cursoProfessor').innerText = data.curso;
+            } else {
+                console.error('Nome ou curso não encontrados.');
+            }
+        })
+        .catch(error => {
+            console.error('Erro no fetch:', error);
+        });
+
+        // Configuração do FullCalendar
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                locale: 'pt-br',
+                events: function(start, end, timezone, callback) {
+                    $.ajax({
+                        url: '/agendamentos',
+                        method: 'GET',
+                        success: function(data) {
+                            const events = data.map(agendamento => ({
+                                title: agendamento.sala,
+                                start: agendamento.inicio,
+                                end: agendamento.fim,
+                                backgroundColor: agendamento.status === 'ocupado' ? '#B22222' : '#006D93',
+                                textColor: '#ffffff'
+                            }));
+                            callback(events);
+                            atualizarResumoDoDia(events);
+                        },
+                        error: function() {
+                            alert('Erro ao carregar os agendamentos.');
+                        }
+                    });
+                },
+                eventClick: function(event) {
+                    alert(`Evento: ${event.title}\nInício: ${event.start.format('HH:mm')}\nFim: ${event.end.format('HH:mm')}`);
+                },
+                height: 'auto',
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                }
+            });
+        });
+
+        // Atualizar resumo de agendamentos do dia
+        function atualizarResumoDoDia(events) {
+            const hoje = moment().format('YYYY-MM-DD');
+            const eventosHoje = events.filter(event => moment(event.start).format('YYYY-MM-DD') === hoje);
+
+            const resumoDiv = document.getElementById('dailySummaryContent');
+            resumoDiv.innerHTML = '';
+
+            if (eventosHoje.length) {
+                eventosHoje.forEach(event => {
+                    resumoDiv.innerHTML += `Sala: ${event.title} - Horário: ${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}<br>`;
+                });
+            } else {
+                resumoDiv.textContent = 'Não há agendamentos para hoje.';
+            }
+        }
+    </script>
+</body>
+</html>
