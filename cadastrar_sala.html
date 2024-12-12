@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Sala</title>
+    <style>
+        /* Cores do brasão da UNEB */
+        :root {
+            --azul-uneb: #003882;
+            --amarelo-uneb: #f1c40f;
+            --vermelho-uneb: #e63946;
+            --branco: #ffffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--azul-uneb);
+            color: var(--branco);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: var(--branco);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 350px;
+            width: 100%;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--azul-uneb);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: var(--azul-uneb);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--azul-uneb);
+            border-radius: 5px;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--amarelo-uneb);
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--azul-uneb);
+            color: var(--branco);
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: var(--amarelo-uneb);
+            color: var(--azul-uneb);
+        }
+
+        .btn-sair {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--vermelho-uneb);
+            color: var(--branco);
+            font-size: 14px;
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-sair:hover {
+            background-color: #c5303b;
+        }
+
+        /* Modal de confirmação */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--branco);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .modal-content button {
+            width: 40%;
+            margin: 10px 5%;
+            font-size: 14px;
+        }
+
+        .modal-content h2 {
+            color: var(--azul-uneb);
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="btn-sair" onclick="abrirModal()">&#10005;</button>
+        <h1>Cadastrar Sala</h1>
+        <form id="cadastrarSalaForm" method="POST" action="/cadastrarSala">
+            <label for="nome">Nome da Sala:</label>
+            <input type="text" id="nome" name="nome" placeholder="Ex.: Sala 101" required />
+
+            <label for="capacidade">Capacidade:</label>
+            <input type="number" id="capacidade" name="capacidade" min="1" placeholder="Capacidade da sala" required />
+
+            <label for="tipo">Tipo:</label>
+            <select id="tipo" name="tipo" required>
+                <option value="" disabled selected>Selecione o tipo</option>
+                <option value="Auditório">Auditório</option>
+                <option value="Sala">Sala</option>
+                <option value="Laboratório">Laboratório</option>
+            </select>
+
+            <button type="submit">Cadastrar Sala</button>
+        </form>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2>Tem certeza que deseja sair?</h2>
+            <button onclick="confirmarSaida()">Sim</button>
+            <button onclick="fecharModal()">Não</button>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById("modal");
+
+        function abrirModal() {
+            modal.style.display = "flex";
+        }
+
+        function fecharModal() {
+            modal.style.display = "none";
+        }
+
+        function confirmarSaida() {
+            window.location.href = '/admin';
+        }
+    </script>
+</body>
+</html>
